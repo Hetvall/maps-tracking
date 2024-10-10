@@ -1,0 +1,4 @@
+<div *ngIf="kms && duration" class="show-trip-info">
+  <p>Distance: <span>{{ kms | number: '1.2-2' }}</span> Kms</p>
+  <p>Duration: <span>{{ duration | number: '1.0-0' }}</span> minutes</p>
+</div>

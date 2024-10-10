@@ -1,8 +1,7 @@
 import { DirectionsRespose, Route } from './../interfaces/directions';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import {
-  AnySourceData,
   LngLatBounds,
   LngLatLike,
   Map,
@@ -13,12 +12,16 @@ import {
 import { Feature } from '../interfaces/places';
 import { DirectionsApiClient } from '../api';
 
+import Swal from 'sweetalert2';
+
 @Injectable({
   providedIn: 'root',
 })
 export class MapService {
   private map?: Map;
   private markers: Marker[] = [];
+
+  tripInfoEmitter = new EventEmitter<{ kms: number; duration: number }>();
 
   get isMapReady() {
     return !!this.map;
@@ -31,7 +34,7 @@ export class MapService {
   }
 
   flyTo(coords: LngLatLike) {
-    if (!this.isMapReady) throw Error('Map is not inicialized');
+    if (!this.isMapReady) throw Error('Map not inicialized');
 
     this.map?.flyTo({
       zoom: 14,
@@ -78,16 +81,45 @@ export class MapService {
   getRouteBetweenPoints(start: [number, number], end: [number, number]) {
     this.directionsApi
       .get<DirectionsRespose>(`/${start.join(',')};${end.join(',')}`)
-      .subscribe((resp) => {
-        if (resp.routes.length === 0)
-          throw 'Not possible to go driving or walking';
+      .subscribe({
+        next: (resp) => {
+          console.log(resp);
+          if (resp.routes.length === 0) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'No route found.',
+              icon: 'info',
+              confirmButtonText: 'Ok',
+              customClass: {
+                popup: 'small-alert',
+              },
+            });
+            return;
+          }
 
-        this.drawPolyline(resp.routes[0]);
+          this.drawPolyline(resp.routes[0]);
+        },
+        error: (error) => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Not able to go driving.',
+            icon: 'error',
+            confirmButtonText: 'Ok',
+            customClass: {
+              popup: 'small-alert',
+            },
+          });
+        },
       });
   }
 
   private drawPolyline(route: Route) {
-    console.log({ kms: route.distance / 1000, duration: route.duration / 60 });
+    if (!this.drawPolyline) throw Error('Invalid route');
+
+    const kms = route.distance / 1000;
+    const duration = route.duration / 60;
+
+    this.tripInfoEmitter.emit({ kms, duration });
 
     if (!this.map) throw Error('Map not inicialized');
 

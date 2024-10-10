@@ -8,9 +8,19 @@ import { BtnMyLocationComponent } from './components/btn-my-location/btn-my-loca
 import { AngularLogoComponent } from './components/angular-logo/angular-logo.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { SearchResultsComponent } from './components/search-results/search-results.component';
+import { ShowTripInfoComponent } from './components/show-trip-info/show-trip-info.component';
 
 @NgModule({
-  declarations: [MapScreenComponent, MapViewComponent, LoadingComponent, BtnMyLocationComponent, AngularLogoComponent, SearchBarComponent, SearchResultsComponent],
+  declarations: [
+    MapScreenComponent,
+    MapViewComponent,
+    LoadingComponent,
+    BtnMyLocationComponent,
+    AngularLogoComponent,
+    SearchBarComponent,
+    SearchResultsComponent,
+    ShowTripInfoComponent,
+  ],
   imports: [CommonModule],
   exports: [MapScreenComponent],
 })
